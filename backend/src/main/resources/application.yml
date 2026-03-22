@@ -1,0 +1,92 @@
+spring:
+  application:
+    name: route-provider
+
+  # PostgreSQL Database
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:routeprovider}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+
+  # JPA/Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 50
+
+  # Redis Cache
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+
+  # Cache type - TTL is managed via CachePort, not Spring Cache abstraction
+  cache:
+    type: redis
+
+  # Jackson JSON
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    property-naming-strategy: LOWER_CAMEL_CASE
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:mySecretKeyForDevelopment12345678901234567890}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+# Application Settings
+application:
+  route:
+    cache-ttl-minutes: 15
+  graph-cache:
+    ttl-minutes: 60
+
+# Seed Data (for development only - change in production!)
+app:
+  seed:
+    admin-password: ${ADMIN_PASSWORD:admin123}
+    agency-password: ${AGENCY_PASSWORD:agency123}
+  
+  # CORS Configuration
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173}
+
+logging:
+  level:
+    root: INFO
+    com.aviation.routeprovider: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+
+# Server
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+# Swagger/OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html

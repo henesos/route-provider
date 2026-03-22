@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: route-provider-test
+
+  # Datasource is provided dynamically by Testcontainers PostgreSQL
+  # See PostgreSQLIntegrationTest.configureProperties()
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # Redis configuration (disabled in tests via autoconfigure.exclude)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # Disable cache for testing
+  cache:
+    type: none
+
+  # Exclude Redis autoconfiguration to prevent connection attempts during tests
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+
+# JWT configuration for tests
+jwt:
+  secret: ThisIsAVeryLongSecretKeyForJwtTokenGenerationThatShouldBeAtLeast256BitsLong
+  expiration: 86400000
+
+# Seed data configuration for integration tests
+app:
+  seed:
+    enabled: true
+    admin-password: admin123
+    agency-password: agency123
+
+# Logging configuration
+logging:
+  level:
+    root: WARN
+    com.aviation.routeprovider: INFO

@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: route-provider-postgres
+    environment:
+      POSTGRES_DB: routeprovider
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: route-provider-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: route-provider-backend
+    environment:
+      # Database Configuration
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/routeprovider
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      
+      # Redis Configuration
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      
+      # JWT Configuration
+      JWT_SECRET: ThisIsAVeryLongSecretKeyForJwtTokenGenerationThatShouldBeAtLeast256BitsLong
+      JWT_EXPIRATION: 86400000
+      
+      # Seed User Passwords (for DataInitializer)
+      ADMIN_PASSWORD: admin123
+      AGENCY_PASSWORD: agency123
+      
+      # CORS Configuration
+      CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3000,http://localhost
+      
+      # FIX [ISSUE 5]: Explicitly set ddl-auto for docker-compose deployment
+      # Schema: 'update' creates/updates schema on startup (safe for demo).
+      # For production with existing data: change to 'validate' and use
+      # Flyway or Liquibase for controlled migrations.
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      
+      # JVM Options
+      JAVA_OPTS: -Xms256m -Xmx512m
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/auth/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: route-provider-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  redis_data:

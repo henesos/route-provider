@@ -1,0 +1,30 @@
+# Maven (backend)
+backend/target/
+*.jar
+*.war
+*.class
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.next/
+frontend/build/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+backend/src/main/resources/application-local.yml
+
+# OS
+.DS_Store
+Thumbs.db
