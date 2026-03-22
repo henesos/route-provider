@@ -104,7 +104,7 @@ npm run dev
 | Method | Endpoint | Description | Role |
 |--------|----------|-------------|------|
 | POST | /auth/login | User authentication | Public |
-| GET | /locations | List locations (paginated) | ADMIN |
+| GET | /locations | List locations (paginated) | Public |
 | POST | /locations | Create location | ADMIN |
 | PUT | /locations/{id} | Update location | ADMIN |
 | DELETE | /locations/{id} | Delete location | ADMIN |
