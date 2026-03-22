@@ -6,10 +6,7 @@ Full-stack application for aviation route planning with React frontend and Sprin
 
 ```bash
 # Start everything with one command
-docker-compose up --build
-
-# Or run in background
-docker-compose up --build -d
+docker-compose up -d
 ```
 
 **Access the application:**
